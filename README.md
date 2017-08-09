@@ -10,7 +10,9 @@ right in your tenant.
 
 ## Usage
 
+```
 ./client_creds.sh -t <Okta API Token> -o <Okta tenant - ex: micah.okta.com>
+```
 
 ## Under the covers
 
