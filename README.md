@@ -1,12 +1,11 @@
 ## OAuth2 Client Credentials Flow
 
-Currently, there is no way to create an application in Okta's admin console
-suitable for use with the `grant_type=client_credentials`.
+There are a number of steps to create an environment in Okta suitable to use the
+OAuth2 Client Credentials flow. There's no one button or one place to set it up
+in the admin console.
 
-This will be changing very soon.
-
-In the meantime, you can use the `client_creds.sh` script to get things setup
-right in your tenant.
+You can use the `client_creds.sh` script to get things setup right in your
+tenant.
 
 ## Usage
 
