@@ -94,7 +94,18 @@ usage()
   echo "$0 -t <API TOKEN> -o <OKTA TENANT HOST - ex: micah.okta.com>"
 }
 
-args=`getopt t:o:n: $*` ; errcode=$?; set -- $args
+check_api_error() {
+  response=$1
+  error_code=`echo "$response" | jq -r '.errorCode'`
+
+  if [ "$error_code" != "null" ];
+  then
+    echo $response
+    exit 1
+  fi
+}
+
+args=`getopt t:o: $*` ; errcode=$?; set -- $args
 
 while true ; do
   case "$1" in
@@ -141,6 +152,8 @@ create_client_response=$(curl -s \
 -d "$(get_json_for_client)" \
 https://$OKTA_TENANT/oauth2/v1/clients)
 
+check_api_error "$create_client_response"
+
 client_id=`echo "$create_client_response" | jq -r '.client_id'`
 client_secret=`echo "$create_client_response" | jq -r '.client_secret'`
 
@@ -153,6 +166,8 @@ create_auth_server_response=$(curl -s \
 -d "$(get_json_for_authorization_server)" \
 https://$OKTA_TENANT/api/v1/authorizationServers)
 
+check_api_error "$create_auth_server_response"
+
 authorization_server_id=`echo "$create_auth_server_response" | jq -r '.id'`
 
 echo "## Create Default Scope"
@@ -164,6 +179,8 @@ create_default_scope_response=$(curl -s \
 -d "$(get_json_for_default_scope)" \
 https://$OKTA_TENANT/api/v1/authorizationServers/$authorization_server_id/scopes)
 
+check_api_error "$create_default_scope_response"
+
 echo "## Create Policy"
 
 create_policy_response=$(curl -s \
@@ -172,6 +189,8 @@ create_policy_response=$(curl -s \
 -X POST \
 -d "$(get_json_for_policy)" \
 https://$OKTA_TENANT/api/v1/authorizationServers/$authorization_server_id/policies)
+
+check_api_error "$create_policy_response"
 
 policy_id=`echo "$create_policy_response" | jq -r '.id'`
 
@@ -183,6 +202,8 @@ create_rule_response=$(curl -s \
 -X POST \
 -d "$(get_json_for_rule)" \
 https://$OKTA_TENANT/api/v1/authorizationServers/$authorization_server_id/policies/$policy_id/rules)
+
+check_api_error "$create_rule_response"
 
 echo "## All Set!"
 echo
